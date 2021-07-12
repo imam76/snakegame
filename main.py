@@ -1,15 +1,15 @@
-# import package
+# imports
 import turtle
 import time
 import random
 
 delay = 0.1
 
-# score
+# scores
 score = 0
-hightScore = 0
+high_score = 0
 
-# screen setup
+# set up screen
 wn = turtle.Screen()
 wn.title("Snake Game")
 wn.bgcolor('yellow')
@@ -31,7 +31,7 @@ food.speed(0)
 food.shape("square")
 food.color("red")
 food.penup()
-food.goto(0, 10)
+food.goto(0, 100)
 
 segments = []
 
@@ -43,132 +43,136 @@ sc.color("black")
 sc.penup()
 sc.hideturtle()
 sc.goto(0, 260)
-sc.write("Score: 0, High Score: 0", align="center",
+sc.write("score: 0  High score: 0", align="center",
          font=("ds-digital", 24, "normal"))
 
-# func
+# Functions
 
 
-def goUp():
+def go_up():
     if head.direction != "down":
         head.direction = "up"
 
 
-def goDown():
+def go_down():
     if head.direction != "up":
         head.direction = "down"
 
 
-def goRight():
-    if head.direction != "left":
-        head.direction = "right"
-
-
-def goLeft():
+def go_left():
     if head.direction != "right":
         head.direction = "left"
 
 
-def move():
-    if head.direction != "up":
-        y = head.ycor()
-        head.sety(y + 20)
-    if head.direction != "down":
-        y = head.ycor()
-        head.sety(y - 20)
-    if head.direction != "right":
-        x = head.xcor()
-        head.setx(x + 20)
+def go_right():
     if head.direction != "left":
+        head.direction = "right"
+
+
+def move():
+    if head.direction == "up":
+        y = head.ycor()
+        head.sety(y+20)
+    if head.direction == "down":
+        y = head.ycor()
+        head.sety(y-20)
+    if head.direction == "left":
         x = head.xcor()
-        head.setx(x - 20)
+        head.setx(x-20)
+    if head.direction == "right":
+        x = head.xcor()
+        head.setx(x+20)
 
 
-# key bindings
+# keyboard bindings
 wn.listen()
-wn.onkeypress(goUp, "w")
-wn.onkeypress(goDown, "s")
-wn.onkeypress(goRight, "d")
-wn.onkeypress(goLeft, "a")
+wn.onkeypress(go_up, "w")
+wn.onkeypress(go_down, "s")
+wn.onkeypress(go_left, "a")
+wn.onkeypress(go_right, "d")
 
-# main loop
-
+# MainLoop
 while True:
     wn.update()
 
-    # check collision
+    # check collision with border area
     if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
         time.sleep(1)
         head.goto(0, 0)
         head.direction = "stop"
 
-    # hide segmen body
-    for segment in segments:
-        segment.goto(1000, 1000)  # out of range / keluar jalur
-    # clear the segments
-    segments.clear()
+        # hide the segments of body
+        for segment in segments:
+            segment.goto(1000, 1000)  # out of range
+        # clear the segments
+        segments.clear()
 
-    # reset
-    score = 0
-    delay = 0.1
-    sc.clear()
-    # .format(score, hightScore)
-    sc.write("Score: {}, High Score: {}".format(score, hightScore), align="center",
-             font=("ds-digital", 24, "normal"))
+        # reset score
+        score = 0
 
-    # check collision food
+        # reset delay
+        delay = 0.1
+
+        sc.clear()
+        sc.write("score: {}  High score: {}".format(score, high_score),
+                 align="center", font=("ds-digital", 24, "normal"))
+
+    # check collision with food
     if head.distance(food) < 20:
+        # move the food to random place
         x = random.randint(-290, 290)
         y = random.randint(-290, 290)
         food.goto(x, y)
 
-        # add new segmen to the head
-        newSegment = turtle.Turtle()
-        newSegment.speed(0)
-        newSegment.shape("square")
-        newSegment.color("black")
-        newSegment.penup()
-        segments.append(newSegment)
+        # add a new segment to the head
+        new_segment = turtle.Turtle()
+        new_segment.speed(0)
+        new_segment.shape("square")
+        new_segment.color("black")
+        new_segment.penup()
+        segments.append(new_segment)
 
-        # shorten delay
+        # shorten the delay
         delay -= 0.001
-        # increase score
+        # increase the score
         score += 10
 
-        if score > hightScore:
-            hightScore = score
+        if score > high_score:
+            high_score = score
         sc.clear()
-        sc.write("Score: {}, High Score: {}".format(score, hightScore), align="center",
-                 font=("ds-digital", 24, "normal"))
+        sc.write("score: {}  High score: {}".format(score, high_score),
+                 align="center", font=("ds-digital", 24, "normal"))
 
-# move segment
-for index in range(len(segments)-1, 0, -1):
-    x = segments[index-1].xcor()
-    y = segments[index-1].ycor()
-    segments[index].goto(x, y)
-# move segment 0 to head
-if len(segments) > 0:
-    x = head.xcor()
-    y = head.ycor()
-    segments[0].goto(x, y)
+    # move the segments in reverse order
+    for index in range(len(segments)-1, 0, -1):
+        x = segments[index-1].xcor()
+        y = segments[index-1].ycor()
+        segments[index].goto(x, y)
+    # move segment 0 to head
+    if len(segments) > 0:
+        x = head.xcor()
+        y = head.ycor()
+        segments[0].goto(x, y)
 
-move()
+    move()
 
-for segment in segments:
-    if segment.distance(head) < 20:
-        time.sleep(1)
-        head.goto(0, 0)
-        head.direction = "stop"
+    # check for collision with body
+    for segment in segments:
+        if segment.distance(head) < 20:
+            time.sleep(1)
+            head.goto(0, 0)
+            head.direction = "stop"
 
-        for segment in segments:
-            segment.goto(1000, 1000)
-        segments.clear()
-        score = 0
-        delay = 0.1
+            # hide segments
+            for segment in segments:
+                segment.goto(1000, 1000)
+            segments.clear()
+            score = 0
+            delay = 0.1
 
-        sc.clear()
-        sc.write("Score: {}, High Score: {}".format(score, hightScore), align="center",
-                 font=("ds-digital", 24, "normal"))
-
+            # update the score
+            sc.clear()
+            sc.write("score: {}  High score: {}".format(score, high_score),
+                     align="center", font=("ds-digital", 24, "normal"))
     time.sleep(delay)
 wn.mainloop()
